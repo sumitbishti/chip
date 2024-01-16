@@ -22,7 +22,7 @@ const ChipComponent = () => {
 		return availableItems.filter((item) =>
 			item.toLowerCase().startsWith(input)
 		);
-	}, [inputValue]);
+	}, [inputValue, availableItems]);
 
 	const handleInputFocus = () => {
 		setIsInputFocused(true);
