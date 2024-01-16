@@ -3,9 +3,6 @@ import ChipComponent from '../components/chip';
 
 export default function Home() {
 
-  const handleClick = () => {
-    console.log('clicked')
-  }
 
   return (
     <main style={{ height: '100vh', display: 'flex' }}>

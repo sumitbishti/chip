@@ -1,10 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const ChipComponent = () => {
 	const [inputValue, setInputValue] = useState("");
 	const [availableItems, setAvailableItems] = useState([
 		"Item1",
+		"sumit",
+		"amit",
 		"Item2",
 		"Item3",
 	]);
@@ -15,6 +17,13 @@ const ChipComponent = () => {
 		setInputValue(event.target.value);
 	};
 
+	const filteredItems = useMemo(() => {
+		const input = inputValue.toLowerCase();
+		return availableItems.filter((item) =>
+			item.toLowerCase().startsWith(input)
+		);
+	}, [inputValue]);
+
 	const handleInputFocus = () => {
 		setIsInputFocused(true);
 	};
@@ -24,7 +33,7 @@ const ChipComponent = () => {
 	};
 
 	const handleItemClick = (item) => {
-		console.log(item, "clicked");
+		// console.log(item, "clicked");
 		setSelectedItems([...selectedItems, item]);
 		setAvailableItems(
 			availableItems.filter((availableItem) => availableItem !== item)
@@ -48,26 +57,24 @@ const ChipComponent = () => {
 
 	return (
 		<div className="chip-container">
-			<div>
+			<div style={{ position: "absolute" }}>
 				{selectedItems.map((item) => (
-					<div key={item} className="chip">
+					<div key={item} className="chip" style={{ backgroundColor: "gray" }}>
 						{item} <span onClick={() => handleChipRemove(item)}>X</span>
 					</div>
 				))}
 			</div>
-			<div className={`item-list ${isInputFocused ? "visible" : "visible"}`}>
+			<div className={`item-list ${isInputFocused ? "visible" : ""}`}>
 				<ul>
-					{availableItems.map((item) => {
-						return (
-							<li
-								key={item}
-								onClick={() => handleItemClick(item)}
-								style={{ color: "black" }}
-							>
-								{item}
-							</li>
-						);
-					})}
+					{filteredItems.map((item) => (
+						<li
+							key={item}
+							onMouseDown={() => handleItemClick(item)}
+							style={{ color: "black" }}
+						>
+							{item}
+						</li>
+					))}
 				</ul>
 			</div>
 			<input
@@ -76,12 +83,11 @@ const ChipComponent = () => {
 				onChange={handleInputChange}
 				onFocus={handleInputFocus}
 				onBlur={handleInputBlur}
-				placeholder="Type to search..."
-				style={{ color: "black" }}
+				placeholder={selectedItems.length ? "" : "Type here..."}
+				style={{ color: "black", width: "100%", height: "50px" }}
 			/>
 
 			<style jsx>{`
-				/* Add your CSS styling here */
 				.chip-container {
 					position: relative;
 				}
@@ -99,12 +105,13 @@ const ChipComponent = () => {
 				}
 				.item-list {
 					position: absolute;
-					top: 100%;
+					top: calc(100% + 5px); /* Adjust the distance from the input */
 					left: 0;
 					background-color: #fff;
 					box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 					border: 1px solid #ccc;
 					display: none;
+					width: 100%;
 				}
 				.item-list.visible {
 					display: block;
