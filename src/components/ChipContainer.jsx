@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import UsersList from "./UsersList";
 import Chip from "./Chip";
 
@@ -10,7 +10,15 @@ const ChipContainer = () => {
 		"amit",
 		"rohit",
 		"suman",
-		"aman",
+		"amani",
+		"amiti",
+		"rohiti",
+		"sumani",
+		"amano",
+		"amito",
+		"rohito",
+		"sumano",
+		"amana",
 	]);
 	const [selectedItems, setSelectedItems] = useState([]);
 	const [isInputFocused, setIsInputFocused] = useState(false);
@@ -36,7 +44,9 @@ const ChipContainer = () => {
 	const handleInputFocus = () => {
 		setIsInputFocused(true);
 		setSelectedIndex(-1);
+	};
 
+	useEffect(() => {
 		if (inputRef.current) {
 			const inputRect = inputRef.current.getBoundingClientRect();
 			setInputPosition({
@@ -44,7 +54,7 @@ const ChipContainer = () => {
 				left: inputRect.left + window.scrollX,
 			});
 		}
-	};
+	}, [selectedItems]);
 
 	const handleInputBlur = () => {
 		setIsInputFocused(false);
@@ -117,6 +127,7 @@ const ChipContainer = () => {
 					/>
 				))}
 				<input
+					className="input"
 					type="text"
 					value={inputValue}
 					onChange={handleInputChange}
@@ -125,7 +136,6 @@ const ChipContainer = () => {
 					onKeyDown={handleKeyDown}
 					placeholder={"Add user..."}
 					ref={inputRef}
-					className="input"
 				/>
 			</div>
 			<UsersList
@@ -146,6 +156,7 @@ const ChipContainer = () => {
 					display: flex;
 					flex-wrap: wrap;
 					background-color: white;
+					border-radius: 10px 10px 0 0;
 				}
 
 				.input {
@@ -154,6 +165,7 @@ const ChipContainer = () => {
 					width: fit-content;
 					outline: none;
 					padding: 0.5em;
+					border-radius: 10px 10px 0 0;
 				}
 			`}</style>
 		</div>
