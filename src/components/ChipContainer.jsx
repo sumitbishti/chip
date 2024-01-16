@@ -1,73 +1,27 @@
 import { useState, useMemo, useRef, useCallback } from "react";
+import UsersList from "./UsersList";
 import Chip from "./Chip";
-
-const ItemsList = ({
-	isInputFocused,
-	filteredItems,
-	inputPosition,
-	handleItemClick,
-}) => {
-	return (
-		<div
-			className={`item-list ${isInputFocused ? "visible" : ""}`}
-			style={{ top: inputPosition.bottom, left: inputPosition.left }}
-		>
-			<ul>
-				{filteredItems.map((item) => (
-					<li key={item} onMouseDown={() => handleItemClick(item)}>
-						{item}
-					</li>
-				))}
-			</ul>
-			<style jsx>
-				{`
-					.item-list {
-						position: fixed;
-						background-color: #fff;
-						box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-						display: none;
-						width: 30%;
-						z-index: 1000;
-					}
-
-					.item-list.visible {
-						display: block;
-					}
-
-					.item-list ul {
-						list-style: none;
-						padding: 0;
-						margin: 0;
-					}
-
-					.item-list li {
-						padding: 0.5em;
-						cursor: pointer;
-						color: black;
-					}
-				`}
-			</style>
-		</div>
-	);
-};
 
 const ChipContainer = () => {
 	const [inputValue, setInputValue] = useState("");
 	const [availableItems, setAvailableItems] = useState([
-		"Item1",
+		"rohan",
 		"sumit",
 		"amit",
-		"Item2",
-		"Item3",
+		"rohit",
+		"suman",
+		"aman",
 	]);
 	const [selectedItems, setSelectedItems] = useState([]);
 	const [isInputFocused, setIsInputFocused] = useState(false);
 	const [inputPosition, setInputPosition] = useState({ bottom: 0, left: 0 });
+	const [backspaceCount, setBackspaceCount] = useState(0);
 
 	const inputRef = useRef(null);
 
 	const handleInputChange = (event) => {
 		setInputValue(event.target.value);
+		setBackspaceCount(0);
 	};
 
 	const filteredItems = useMemo(() => {
@@ -110,11 +64,32 @@ const ChipContainer = () => {
 		[availableItems, selectedItems]
 	);
 
+	const handleKeyDown = (e) => {
+		if (e.key === "Backspace") {
+			if (inputValue === "" && backspaceCount === 0) {
+				setBackspaceCount(1);
+			} else if (inputValue === "" && backspaceCount === 1) {
+				const lastChip = selectedItems[selectedItems.length - 1];
+				if (lastChip) {
+					handleChipRemove(lastChip);
+					setBackspaceCount(0);
+				}
+			}
+		}
+	};
+
 	return (
 		<div className="chip-container">
 			<div className="chips-input-container">
 				{selectedItems.map((item, index) => (
-					<Chip key={index} label={item} onClick={handleChipRemove} />
+					<Chip
+						key={index}
+						label={item}
+						onClick={handleChipRemove}
+						highlight={
+							index === selectedItems.length - 1 && backspaceCount === 1
+						}
+					/>
 				))}
 				<input
 					type="text"
@@ -122,12 +97,13 @@ const ChipContainer = () => {
 					onChange={handleInputChange}
 					onFocus={handleInputFocus}
 					onBlur={handleInputBlur}
-					placeholder={selectedItems.length ? "" : "Type here..."}
+					onKeyDown={handleKeyDown}
+					placeholder={"Add user..."}
 					ref={inputRef}
 					className="input"
 				/>
 			</div>
-			<ItemsList
+			<UsersList
 				isInputFocused={isInputFocused}
 				filteredItems={filteredItems}
 				inputPosition={inputPosition}
@@ -137,7 +113,6 @@ const ChipContainer = () => {
 			<style jsx>{`
 				.chip-container {
 					position: relative;
-					background-color: red;
 				}
 
 				.chips-input-container {
@@ -151,6 +126,7 @@ const ChipContainer = () => {
 					height: 50px;
 					width: fit-content;
 					outline: none;
+					padding: 0.5em;
 				}
 			`}</style>
 		</div>
