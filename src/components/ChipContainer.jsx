@@ -1,4 +1,55 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
+import Chip from "./Chip";
+
+const ItemsList = ({
+	isInputFocused,
+	filteredItems,
+	inputPosition,
+	handleItemClick,
+}) => {
+	return (
+		<div
+			className={`item-list ${isInputFocused ? "visible" : ""}`}
+			style={{ top: inputPosition.bottom, left: inputPosition.left }}
+		>
+			<ul>
+				{filteredItems.map((item) => (
+					<li key={item} onMouseDown={() => handleItemClick(item)}>
+						{item}
+					</li>
+				))}
+			</ul>
+			<style jsx>
+				{`
+					.item-list {
+						position: fixed;
+						background-color: #fff;
+						box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+						display: none;
+						width: 30%;
+						z-index: 1000;
+					}
+
+					.item-list.visible {
+						display: block;
+					}
+
+					.item-list ul {
+						list-style: none;
+						padding: 0;
+						margin: 0;
+					}
+
+					.item-list li {
+						padding: 0.5em;
+						cursor: pointer;
+						color: black;
+					}
+				`}
+			</style>
+		</div>
+	);
+};
 
 const ChipContainer = () => {
 	const [inputValue, setInputValue] = useState("");
@@ -21,9 +72,9 @@ const ChipContainer = () => {
 
 	const filteredItems = useMemo(() => {
 		const input = inputValue.toLowerCase();
-		return availableItems.filter((item) =>
-			item.toLowerCase().startsWith(input)
-		);
+		return availableItems.filter((item) => {
+			return item.toLowerCase().startsWith(input);
+		});
 	}, [inputValue, availableItems]);
 
 	const handleInputFocus = () => {
@@ -49,24 +100,21 @@ const ChipContainer = () => {
 		setInputValue("");
 	};
 
-	const handleChipRemove = (item) => {
-		setSelectedItems(
-			selectedItems.filter((selectedItem) => selectedItem !== item)
-		);
-		setAvailableItems([...availableItems, item]);
-	};
+	const handleChipRemove = useCallback(
+		(item) => {
+			setSelectedItems(
+				selectedItems.filter((selectedItem) => selectedItem !== item)
+			);
+			setAvailableItems([...availableItems, item]);
+		},
+		[availableItems, selectedItems]
+	);
 
 	return (
 		<div className="chip-container">
 			<div className="chips-input-container">
 				{selectedItems.map((item, index) => (
-					<div
-						key={item}
-						className={`chip`}
-						style={{ backgroundColor: "gray" }}
-					>
-						{item} <span onClick={() => handleChipRemove(item)}>X</span>
-					</div>
+					<Chip key={index} label={item} onClick={handleChipRemove} />
 				))}
 				<input
 					type="text"
@@ -76,35 +124,20 @@ const ChipContainer = () => {
 					onBlur={handleInputBlur}
 					placeholder={selectedItems.length ? "" : "Type here..."}
 					ref={inputRef}
-					style={{
-						color: "black",
-						height: "50px",
-						width: "fit-content",
-						outline: "none",
-					}}
+					className="input"
 				/>
 			</div>
-
-			<div
-				className={`item-list ${isInputFocused ? "visible" : ""}`}
-				style={{ top: inputPosition.bottom, left: inputPosition.left }}
-			>
-				<ul>
-					{filteredItems.map((item) => (
-						<li
-							key={item}
-							onMouseDown={() => handleItemClick(item)}
-							style={{ color: "black" }}
-						>
-							{item}
-						</li>
-					))}
-				</ul>
-			</div>
+			<ItemsList
+				isInputFocused={isInputFocused}
+				filteredItems={filteredItems}
+				inputPosition={inputPosition}
+				handleItemClick={handleItemClick}
+			/>
 
 			<style jsx>{`
 				.chip-container {
 					position: relative;
+					background-color: red;
 				}
 
 				.chips-input-container {
@@ -113,43 +146,11 @@ const ChipContainer = () => {
 					background-color: white;
 				}
 
-				.chip {
-					display: inline-block;
-					padding: 0.5em;
-					margin: 0.5em;
-					border: 1px solid #ccc;
-					border-radius: 4px;
-					cursor: pointer;
-				}
-
-				.chip span {
-					cursor: pointer;
-					margin-left: 0.5em;
-					color: #888;
-				}
-
-				.item-list {
-					position: fixed;
-					background-color: #fff;
-					box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-					display: none;
-					width: 30%;
-					z-index: 1000;
-				}
-
-				.item-list.visible {
-					display: block;
-				}
-
-				.item-list ul {
-					list-style: none;
-					padding: 0;
-					margin: 0;
-				}
-
-				.item-list li {
-					padding: 0.5em;
-					cursor: pointer;
+				.input {
+					color: black;
+					height: 50px;
+					width: fit-content;
+					outline: none;
 				}
 			`}</style>
 		</div>
