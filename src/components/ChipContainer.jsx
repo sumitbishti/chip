@@ -1,7 +1,6 @@
-"use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 
-const ChipComponent = () => {
+const ChipContainer = () => {
 	const [inputValue, setInputValue] = useState("");
 	const [availableItems, setAvailableItems] = useState([
 		"Item1",
@@ -12,6 +11,9 @@ const ChipComponent = () => {
 	]);
 	const [selectedItems, setSelectedItems] = useState([]);
 	const [isInputFocused, setIsInputFocused] = useState(false);
+	const [inputPosition, setInputPosition] = useState({ bottom: 0, left: 0 });
+
+	const inputRef = useRef(null);
 
 	const handleInputChange = (event) => {
 		setInputValue(event.target.value);
@@ -26,6 +28,13 @@ const ChipComponent = () => {
 
 	const handleInputFocus = () => {
 		setIsInputFocused(true);
+		if (inputRef.current) {
+			const inputRect = inputRef.current.getBoundingClientRect();
+			setInputPosition({
+				bottom: inputRect.bottom + window.scrollY,
+				left: inputRect.left + window.scrollX,
+			});
+		}
 	};
 
 	const handleInputBlur = () => {
@@ -33,7 +42,6 @@ const ChipComponent = () => {
 	};
 
 	const handleItemClick = (item) => {
-		// console.log(item, "clicked");
 		setSelectedItems([...selectedItems, item]);
 		setAvailableItems(
 			availableItems.filter((availableItem) => availableItem !== item)
@@ -48,23 +56,39 @@ const ChipComponent = () => {
 		setAvailableItems([...availableItems, item]);
 	};
 
-	useEffect(() => {
-		// Update available items when selected items change
-		setAvailableItems(
-			availableItems.filter((item) => !selectedItems.includes(item))
-		);
-	}, [selectedItems]);
-
 	return (
 		<div className="chip-container">
-			<div style={{ position: "absolute" }}>
-				{selectedItems.map((item) => (
-					<div key={item} className="chip" style={{ backgroundColor: "gray" }}>
+			<div className="chips-input-container">
+				{selectedItems.map((item, index) => (
+					<div
+						key={item}
+						className={`chip`}
+						style={{ backgroundColor: "gray" }}
+					>
 						{item} <span onClick={() => handleChipRemove(item)}>X</span>
 					</div>
 				))}
+				<input
+					type="text"
+					value={inputValue}
+					onChange={handleInputChange}
+					onFocus={handleInputFocus}
+					onBlur={handleInputBlur}
+					placeholder={selectedItems.length ? "" : "Type here..."}
+					ref={inputRef}
+					style={{
+						color: "black",
+						height: "50px",
+						width: "fit-content",
+						outline: "none",
+					}}
+				/>
 			</div>
-			<div className={`item-list ${isInputFocused ? "visible" : ""}`}>
+
+			<div
+				className={`item-list ${isInputFocused ? "visible" : ""}`}
+				style={{ top: inputPosition.bottom, left: inputPosition.left }}
+			>
 				<ul>
 					{filteredItems.map((item) => (
 						<li
@@ -77,50 +101,52 @@ const ChipComponent = () => {
 					))}
 				</ul>
 			</div>
-			<input
-				type="text"
-				value={inputValue}
-				onChange={handleInputChange}
-				onFocus={handleInputFocus}
-				onBlur={handleInputBlur}
-				placeholder={selectedItems.length ? "" : "Type here..."}
-				style={{ color: "black", width: "100%", height: "50px" }}
-			/>
 
 			<style jsx>{`
 				.chip-container {
 					position: relative;
 				}
+
+				.chips-input-container {
+					display: flex;
+					flex-wrap: wrap;
+					background-color: white;
+				}
+
 				.chip {
 					display: inline-block;
 					padding: 0.5em;
 					margin: 0.5em;
 					border: 1px solid #ccc;
 					border-radius: 4px;
+					cursor: pointer;
 				}
+
 				.chip span {
 					cursor: pointer;
 					margin-left: 0.5em;
 					color: #888;
 				}
+
 				.item-list {
-					position: absolute;
-					top: calc(100% + 5px); /* Adjust the distance from the input */
-					left: 0;
+					position: fixed;
 					background-color: #fff;
 					box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-					border: 1px solid #ccc;
 					display: none;
-					width: 100%;
+					width: 30%;
+					z-index: 1000;
 				}
+
 				.item-list.visible {
 					display: block;
 				}
+
 				.item-list ul {
 					list-style: none;
 					padding: 0;
 					margin: 0;
 				}
+
 				.item-list li {
 					padding: 0.5em;
 					cursor: pointer;
@@ -130,4 +156,4 @@ const ChipComponent = () => {
 	);
 };
 
-export default ChipComponent;
+export default ChipContainer;
