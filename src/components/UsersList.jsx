@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-
 const UsersList = ({
 	isInputFocused,
 	filteredItems,
 	inputPosition,
 	handleItemClick,
+	selectedIndex,
 }) => {
 	return (
 		<div
@@ -13,7 +12,11 @@ const UsersList = ({
 		>
 			<ul>
 				{filteredItems.map((item, index) => (
-					<li key={item} onMouseDown={() => handleItemClick(item)}>
+					<li
+						key={item}
+						onMouseDown={() => handleItemClick(item)}
+						className={index === selectedIndex ? "selected" : ""}
+					>
 						{item}
 					</li>
 				))}
@@ -45,6 +48,9 @@ const UsersList = ({
 						color: black;
 					}
 
+					.item-list li:hover {
+						background-color: #f0f0f0;
+					}
 					.item-list li.selected {
 						background-color: #f0f0f0;
 					}

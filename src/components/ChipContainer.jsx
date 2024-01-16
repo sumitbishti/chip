@@ -16,11 +16,13 @@ const ChipContainer = () => {
 	const [isInputFocused, setIsInputFocused] = useState(false);
 	const [inputPosition, setInputPosition] = useState({ bottom: 0, left: 0 });
 	const [backspaceCount, setBackspaceCount] = useState(0);
+	const [selectedIndex, setSelectedIndex] = useState(-1);
 
 	const inputRef = useRef(null);
 
 	const handleInputChange = (event) => {
 		setInputValue(event.target.value);
+		setIsInputFocused(true);
 		setBackspaceCount(0);
 	};
 
@@ -33,6 +35,8 @@ const ChipContainer = () => {
 
 	const handleInputFocus = () => {
 		setIsInputFocused(true);
+		setSelectedIndex(-1);
+
 		if (inputRef.current) {
 			const inputRect = inputRef.current.getBoundingClientRect();
 			setInputPosition({
@@ -65,6 +69,10 @@ const ChipContainer = () => {
 	);
 
 	const handleKeyDown = (e) => {
+		if (e.key === "Escape") {
+			setIsInputFocused(false);
+		}
+
 		if (e.key === "Backspace") {
 			if (inputValue === "" && backspaceCount === 0) {
 				setBackspaceCount(1);
@@ -74,6 +82,23 @@ const ChipContainer = () => {
 					handleChipRemove(lastChip);
 					setBackspaceCount(0);
 				}
+			}
+		}
+
+		if (e.key === "ArrowDown") {
+			e.preventDefault();
+			setSelectedIndex((prevIndex) =>
+				prevIndex < filteredItems.length - 1 ? prevIndex + 1 : prevIndex
+			);
+		} else if (e.key === "ArrowUp") {
+			e.preventDefault();
+			setSelectedIndex((prevIndex) =>
+				prevIndex > 0 ? prevIndex - 1 : prevIndex
+			);
+		} else if (e.key === "Enter" && selectedIndex > -1) {
+			handleItemClick(filteredItems[selectedIndex]);
+			if (selectedIndex == availableItems.length - 1) {
+				setSelectedIndex((prev) => prev - 1);
 			}
 		}
 	};
@@ -108,6 +133,8 @@ const ChipContainer = () => {
 				filteredItems={filteredItems}
 				inputPosition={inputPosition}
 				handleItemClick={handleItemClick}
+				onKeyDown={handleKeyDown}
+				selectedIndex={selectedIndex}
 			/>
 
 			<style jsx>{`

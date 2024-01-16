@@ -5,7 +5,6 @@ const Chip = ({ label, onClick, highlight }) => {
 		<div className={`chip ${highlight ? "highlight" : ""}`}>
 			<div
 				style={{
-					border: "1px solid black",
 					borderRadius: "25px",
 					width: "40px",
 					height: "100%",
@@ -15,7 +14,7 @@ const Chip = ({ label, onClick, highlight }) => {
 					alignItems: "center",
 				}}
 			>
-				{label[0]}
+				{label && label[0]}
 			</div>
 
 			<div style={{ padding: "0.5em" }}>
@@ -36,6 +35,9 @@ const Chip = ({ label, onClick, highlight }) => {
 					cursor: pointer;
 					margin: 0 0.2em;
 					fontsize: 1em;
+				}
+
+				.label-container {
 				}
 
 				.highlight {
