@@ -4,6 +4,7 @@ import Chip from "./Chip";
 
 const ChipContainer = () => {
 	const [inputValue, setInputValue] = useState("");
+	/* we can make our users list as an array of objects of name, email and image user props */
 	const [availableItems, setAvailableItems] = useState([
 		"rohan",
 		"sumit",

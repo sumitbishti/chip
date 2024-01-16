@@ -45,12 +45,38 @@ const UsersList = ({
 						onMouseDown={() => handleItemClick(item)}
 						className={index === selectedIndex ? "selected" : ""}
 					>
-						{item}
+						<div className="chip">
+							<div
+								style={{
+									borderRadius: "25px",
+									width: "40px",
+									height: "40px",
+									color: "white",
+									backgroundColor: "black",
+									display: "flex",
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+							>
+								{item && item[0]}
+							</div>
+							{item}
+							{/* we can make our users list as an array of objects of name, email and image user props */}
+							<div style={{ color: "gray" }}>abc@gmail.com</div>
+						</div>
 					</li>
 				))}
 			</ul>
 			<style jsx>
 				{`
+					.chip {
+						display: flex;
+						gap: 0.5em;
+						align-items: center;
+						border-radius: 30px;
+						cursor: pointer;
+					}
+
 					.item-list {
 						position: fixed;
 						background-color: #fff;
